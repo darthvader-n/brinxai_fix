@@ -47,10 +47,6 @@ else
     USE_SUDO=false
 fi
 
-# Enable IP forwarding
-echo "🔐 Enabling IP forwarding..."
-sudo tee /etc/sysctl.d/99-ip-forward.conf <<< 'net.ipv4.ip_forward=1'
-sudo sysctl --system
 
 # Set up NAT masquerading
 EXT_IFACE=$(ip route get 1.1.1.1 | awk '{print $5; exit}')
@@ -90,7 +86,7 @@ $USE_SUDO && sudo docker run -d \
   --name "$CONTAINER_NAME" \
   --cap-add=NET_ADMIN \
   --device /dev/net/tun \
-  --network host \
+  -p 1194:1194/udp \
   --restart always \
   -v "$VOLUME_NAME":/etc/openvpn \
   -e NODE_UUID="$NODE_UUID" \
